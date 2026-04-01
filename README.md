@@ -1,4 +1,4 @@
-# 🚌 Kerala Bus Mini Simulator
+# 🚌 Bus Mini Simulator
 
 A browser-based driving game inspired by real Kerala road conditions and bus driving experience.
 
@@ -41,8 +41,7 @@ It demonstrates core game development concepts such as:
 ## 🛠 Tech Stack
 
 - HTML  
-- CSS  
-- JavaScript (Canvas API)
+
 
 ---
 
@@ -50,13 +49,13 @@ It demonstrates core game development concepts such as:
 
 👉 https://sachinsnair07.github.io/KERALA_SIM.github.io/
 
-*(Update this link if needed)*
+
 
 ---
 
 ## 📸 Preview
 
-_Add screenshots here_
+
 
 ---
 
