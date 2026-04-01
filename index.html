@@ -2,193 +2,1076 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Kerala Bus Mini Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kerala Bus Mini Simulator – Trideva Interactive</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@700;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --bg: #080c14;
+    --surface: #0d1520;
+    --card: #111d2e;
+    --border: rgba(0,200,150,0.15);
+    --accent: #00e5a0;
+    --accent2: #ffc94d;
+    --accent3: #ff6b4a;
+    --text: #e8f0fe;
+    --muted: #6b8098;
+    --glow: 0 0 30px rgba(0,229,160,0.3);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
   body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #222;
-    color: white;
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.5;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 48px;
+    background: rgba(8,12,20,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-shadow: var(--glow);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  nav { display: flex; gap: 32px; }
+  nav a {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  nav a:hover { color: var(--accent); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
     text-align: center;
+    padding: 120px 24px 80px;
+    position: relative;
     overflow: hidden;
   }
-  header {
-    padding: 15px;
-    background: #d32f2f; /* Kerala Bus Red */
-    font-size: 28px;
-    font-weight: bold;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+
+  /* animated road grid */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(rgba(0,229,160,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,160,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridScroll 6s linear infinite;
+    pointer-events: none;
   }
-  .controls { margin: 10px; color: #aaa; font-size: 14px; }
-  button {
-    padding: 12px 25px;
-    font-size: 16px;
-    background: #f44336;
-    color: white;
+
+  @keyframes gridScroll {
+    from { background-position: 0 0; }
+    to   { background-position: 0 60px; }
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    background: rgba(0,229,160,0.06);
+    animation: fadeUp 0.8s ease both;
+  }
+  .badge-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 1.5s ease infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform: scale(1); }
+    50% { opacity:0.4; transform: scale(0.7); }
+  }
+
+  .hero h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(2.4rem, 6vw, 5rem);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+    animation: fadeUp 0.9s 0.1s ease both;
+  }
+
+  .hero h1 span.highlight {
+    color: var(--accent);
+    text-shadow: 0 0 40px rgba(0,229,160,0.5);
+  }
+
+  .hero-sub {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    animation: fadeUp 0.9s 0.2s ease both;
+  }
+
+  .hero p {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 520px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+    animation: fadeUp 0.9s 0.3s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(24px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .btn-primary {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 16px 40px;
+    background: var(--accent);
+    color: #080c14;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: all 0.2s;
+    box-shadow: 0 0 30px rgba(0,229,160,0.35);
+    animation: fadeUp 0.9s 0.4s ease both;
+    position: relative;
+    overflow: hidden;
   }
-  button:hover { background: #b71c1c; }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(0,229,160,0.55); }
+  .btn-primary:hover::after { opacity: 1; }
+  .btn-primary:active { transform: translateY(0); }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 36px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    animation: fadeUp 1s 1s ease both;
+  }
+  .scroll-arrow {
+    width: 24px; height: 24px;
+    border-right: 2px solid var(--muted);
+    border-bottom: 2px solid var(--muted);
+    transform: rotate(45deg);
+    animation: scrollBounce 1.5s ease infinite;
+  }
+  @keyframes scrollBounce {
+    0%,100% { transform: rotate(45deg) translateY(0); }
+    50% { transform: rotate(45deg) translateY(5px); }
+  }
+
+  /* ── SECTION SHARED ── */
+  section { padding: 96px 24px; }
+  .section-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .section-desc {
+    color: var(--muted);
+    line-height: 1.8;
+    font-size: 1rem;
+    max-width: 620px;
+  }
+  .container { max-width: 1080px; margin: 0 auto; }
+
+  /* ── GAME SECTION ── */
+  #game-section {
+    display: none;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  #game-section.visible { display: block; }
+
+  .game-wrapper {
+    display: flex;
+    gap: 48px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .game-canvas-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+
   canvas {
-    background: #333;
-    border: 4px solid #555;
     display: block;
-    margin: 20px auto;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    box-shadow: 0 0 60px rgba(0,0,0,0.7), inset 0 0 40px rgba(0,0,0,0.5);
   }
-  #ui { font-size: 20px; font-weight: bold; }
+
+  .game-ui {
+    min-width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-top: 8px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+  }
+  .stat-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .stat-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat-value.high { color: var(--accent2); }
+
+  .controls-info {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+  }
+  .controls-info .stat-label { margin-bottom: 12px; }
+  .key-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 30px;
+    padding: 0 8px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+    border-radius: 5px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+
+  .btn-restart {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 14px 24px;
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+  }
+  .btn-restart:hover {
+    background: rgba(0,229,160,0.1);
+    box-shadow: 0 0 20px rgba(0,229,160,0.2);
+  }
+
+  .difficulty-bar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+  }
+  .diff-track {
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  .diff-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.5s;
+  }
+
+  /* ── ABOUT ── */
+  #about { background: var(--bg); }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+    margin-top: 48px;
+  }
+  .about-visual {
+    position: relative;
+    height: 300px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .road-preview {
+    width: 120px;
+    height: 100%;
+    background: #1a1a2e;
+    position: relative;
+    overflow: hidden;
+    border-left: 4px solid #333;
+    border-right: 4px solid #333;
+  }
+  .road-preview::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    transform: translateX(-50%);
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--accent2) 0, var(--accent2) 20px,
+      transparent 20px, transparent 40px
+    );
+    animation: roadMove 0.6s linear infinite;
+  }
+  @keyframes roadMove {
+    from { background-position: 0 0; }
+    to { background-position: 0 40px; }
+  }
+  .bus-preview {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 40px;
+    animation: busBob 1s ease-in-out infinite alternate;
+  }
+  @keyframes busBob {
+    from { transform: translateX(-50%) translateY(0); }
+    to { transform: translateX(-50%) translateY(-4px); }
+  }
+  .car-preview {
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 30px;
+    animation: carDrive 2s linear infinite;
+  }
+  @keyframes carDrive {
+    from { top: -40px; }
+    to { top: 110%; }
+  }
+
+  .about-text p {
+    color: var(--muted);
+    line-height: 1.85;
+    margin-bottom: 16px;
+    font-size: 0.97rem;
+  }
+  .about-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border: 1px solid rgba(255,196,77,0.3);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--accent2);
+    background: rgba(255,196,77,0.07);
+    margin: 4px 4px 4px 0;
+  }
+
+  /* ── FEATURES ── */
+  #features {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .features-header { text-align: center; margin-bottom: 56px; }
+  .features-header .section-desc { margin: 0 auto; }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+  }
+  .feature-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 32px 28px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    transform: scaleX(0);
+    transition: transform 0.3s;
+  }
+  .feature-card:hover::before { transform: scaleX(1); }
+  .feature-card:hover {
+    border-color: rgba(0,229,160,0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  }
+  .feature-icon {
+    font-size: 2.2rem;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .feature-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .feature-desc {
+    font-size: 0.87rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 48px 24px;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .footer-logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    margin-bottom: 12px;
+  }
+  footer p {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+  .footer-accent { color: var(--accent2); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    header { padding: 14px 20px; }
+    nav { gap: 16px; }
+    .about-grid { grid-template-columns: 1fr; }
+    .about-visual { display: none; }
+    .game-wrapper { flex-direction: column; align-items: center; }
+    .game-ui { width: 100%; max-width: 400px; flex-direction: row; flex-wrap: wrap; }
+    .stat-card, .controls-info, .difficulty-bar, .btn-restart { flex: 1; min-width: 140px; }
+    canvas { width: 100%; max-width: 400px; height: auto; }
+  }
 </style>
 </head>
 <body>
 
-<header>🚌 KERALA MOTORS</header>
-<div class="controls">Use ← LEFT and RIGHT → keys</div>
+<!-- ── HEADER ── -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🚌</div>
+    TRIDEVA INTERACTIVE
+  </div>
+  <nav>
+    <a href="#game-section">Play</a>
+    <a href="#about">About</a>
+    <a href="#features">Features</a>
+  </nav>
+</header>
 
-<div id="menu">
-  <button onclick="startGame()">Start Engine</button>
-</div>
+<!-- ── HERO ── -->
+<section class="hero" id="hero">
+  <div class="hero-badge"><span class="badge-dot"></span> Now Playable in Browser</div>
+  <p class="hero-sub">Trideva Interactive Presents</p>
+  <h1>Kerala Bus<br><span class="highlight">Mini Simulator</span></h1>
+  <p>Drive through traffic, pick up passengers, and survive as long as possible on the bustling roads of Kerala.</p>
+  <button class="btn-primary" onclick="launchGame()">▶ &nbsp;Play Now</button>
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
 
-<div id="gameArea" style="display:none;">
-  <div id="ui">Score: <span id="score">0</span></div>
-  <canvas id="gameCanvas" width="400" height="600"></canvas>
-  <button id="restartBtn" onclick="restartGame()" style="display:none;">Try Again</button>
-</div>
+<!-- ── GAME SECTION ── -->
+<section id="game-section">
+  <div class="container">
+    <div style="text-align:center; margin-bottom: 48px;">
+      <div class="section-label">🎮 Live Game</div>
+      <h2 class="section-title">Start Your Journey</h2>
+      <p class="section-desc" style="margin: 0 auto;">Use arrow keys or WASD to steer your bus through oncoming traffic. Don't crash!</p>
+    </div>
+    <div class="game-wrapper">
+      <div class="game-canvas-wrap">
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+      </div>
+      <div class="game-ui">
+        <div class="stat-card">
+          <div class="stat-label">Score</div>
+          <div class="stat-value" id="scoreDisplay">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Best</div>
+          <div class="stat-value high" id="bestDisplay">0</div>
+        </div>
+        <div class="difficulty-bar">
+          <div class="stat-label">Difficulty</div>
+          <div class="diff-track"><div class="diff-fill" id="diffFill"></div></div>
+        </div>
+        <div class="controls-info">
+          <div class="stat-label">Controls</div>
+          <div class="key-row"><span class="key">←</span><span class="key">→</span> &nbsp;Move</div>
+          <div class="key-row"><span class="key">A</span><span class="key">D</span> &nbsp;Move</div>
+          <div class="key-row"><span class="key">R</span> &nbsp;Restart</div>
+        </div>
+        <button class="btn-restart" onclick="restartGame()">↺ &nbsp;Restart</button>
+      </div>
+    </div>
+  </div>
+</section>
 
+<!-- ── ABOUT ── -->
+<section id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div>
+        <div class="section-label">About the Game</div>
+        <h2 class="section-title">Born on Kerala's Roads</h2>
+        <div class="about-text">
+          <p>Kerala Bus Mini Simulator is a browser-based arcade game inspired by the chaotic, vibrant, and legendary bus culture of Kerala — where every journey is an adventure.</p>
+          <p>This is a prototype for a much larger project — <strong style="color:var(--accent2)">TVM Bus Simulator</strong> — a full-fledged simulation set in Thiruvananthapuram with authentic routes, real landmarks, and deep passenger mechanics.</p>
+          <p>Built entirely in HTML5 Canvas and JavaScript, this mini version captures the essence of dodging traffic at breakneck speed while keeping your passengers safe.</p>
+          <div style="margin-top: 20px;">
+            <span class="about-tag">HTML5 Canvas</span>
+            <span class="about-tag">No Downloads</span>
+            <span class="about-tag">Prototype v0.1</span>
+            <span class="about-tag">TVM Bus Simulator Preview</span>
+          </div>
+        </div>
+      </div>
+      <div class="about-visual">
+        <div class="road-preview">
+          <div class="car-preview">🚗</div>
+          <div class="bus-preview">🚌</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ── -->
+<section id="features">
+  <div class="container">
+    <div class="features-header">
+      <div class="section-label">What's Inside</div>
+      <h2 class="section-title">Game Features</h2>
+      <p class="section-desc">A compact but fully functional arcade experience packed with game mechanics.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🚦</span>
+        <div class="feature-title">Traffic System</div>
+        <div class="feature-desc">Dynamic oncoming vehicles spawn at varying lanes and speeds, keeping every run unpredictable.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">💥</span>
+        <div class="feature-title">Collision Detection</div>
+        <div class="feature-desc">Precise AABB collision detection ends your run the moment you clip another vehicle.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🏆</span>
+        <div class="feature-title">Score System</div>
+        <div class="feature-desc">Score ticks up every frame you survive. Your personal best is saved for the session.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⚡</span>
+        <div class="feature-title">Increasing Difficulty</div>
+        <div class="feature-desc">Traffic speeds up and spawn intervals shorten the longer you survive. Can you handle the chaos?</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-logo">🚌 TRIDEVA INTERACTIVE</div>
+  <p>Kerala Bus Mini Simulator &nbsp;·&nbsp; Prototype v0.1<br>
+  A preview of <span class="footer-accent">TVM Bus Simulator</span> &nbsp;·&nbsp; Made with ❤️ in Kerala</p>
+</footer>
+
+<!-- ── GAME ENGINE ── -->
 <script>
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-const scoreEl = document.getElementById("score");
-const restartBtn = document.getElementById("restartBtn");
+const canvas  = document.getElementById('gameCanvas');
+const ctx     = canvas.getContext('2d');
 
-let bus = { x: 180, y: 480, width: 45, height: 90, speed: 4 };
-let traffic = [];
-let score = 0;
-let gameOver = false;
-let animationId;
-let roadOffset = 0;
+// ── State ──────────────────────────────────────────
+let state = {};
+let bestScore = 0;
+let animId    = null;
+let trafficInterval = null;
 let keys = {};
 
-// Handle Input
-document.addEventListener("keydown", (e) => keys[e.key] = true);
-document.addEventListener("keyup", (e) => keys[e.key] = false);
+// ── Constants ──────────────────────────────────────
+const LANE_X  = [60, 130, 200, 280, 340]; // 5 lanes
+const BUS_W   = 44, BUS_H = 76;
+const CAR_W   = 36, CAR_H = 64;
+const ROAD_W  = canvas.width;
+const ROAD_H  = canvas.height;
 
-function spawnTraffic() {
-  if (gameOver) return;
-  let x = Math.random() * (canvas.width - 50);
-  traffic.push({ x: x, y: -100, width: 40, height: 80, color: '#2ecc71' });
-  // Slower spawn rate for a more "chilled" experience
-  setTimeout(spawnTraffic, 2000); 
+const CAR_COLORS  = ['#ff6b4a','#ff4081','#e040fb','#7c4dff','#448aff','#18ffff'];
+const CAR_EMOJIS  = ['🚗','🚕','🚙','🛻','🚐'];
+
+// ── Input ──────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  keys[e.key] = true;
+  if (e.key === 'r' || e.key === 'R') restartGame();
+  if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)) e.preventDefault();
+});
+document.addEventListener('keyup',  e => { keys[e.key] = false; });
+
+// ── Init ───────────────────────────────────────────
+function init() {
+  state = {
+    bus: { x: ROAD_W / 2 - BUS_W / 2, y: ROAD_H - BUS_H - 24, speed: 5 },
+    traffic: [],
+    passengers: [],
+    score: 0,
+    alive: true,
+    tick: 0,
+    trafficSpeed: 2.8,
+    spawnInterval: 1600,
+    roadOffset: 0,
+    screenShake: 0,
+    flash: 0,
+  };
 }
 
-function drawBus() {
-  // Main Body (Red)
-  ctx.fillStyle = "#d32f2f";
-  ctx.fillRect(bus.x, bus.y, bus.width, bus.height);
-  // Roof Detail (White)
-  ctx.fillStyle = "white";
-  ctx.fillRect(bus.x + 5, bus.y + 10, bus.width - 10, 20);
-  // Windows
-  ctx.fillStyle = "#333";
-  ctx.fillRect(bus.x + 8, bus.y + 15, bus.width - 16, 10);
-}
-
-function drawTraffic() {
-  traffic.forEach(car => {
-    ctx.fillStyle = "#555"; // Car color
-    ctx.fillRect(car.x, car.y, car.width, car.height);
-    // Headlights
-    ctx.fillStyle = "yellow";
-    ctx.fillRect(car.x + 5, car.y + car.height - 5, 8, 5);
-    ctx.fillRect(car.x + car.width - 13, car.y + car.height - 5, 8, 5);
-  });
-}
-
-function update() {
-  if (gameOver) return;
-
-  // Smooth Movement
-  if (keys["ArrowLeft"] && bus.x > 0) bus.x -= bus.speed;
-  if (keys["ArrowRight"] && bus.x < canvas.width - bus.width) bus.x += bus.speed;
-
-  // Road Animation
-  roadOffset += 3;
-  if (roadOffset > 35) roadOffset = 0;
-
-  // Traffic movement
-  traffic.forEach((car, index) => {
-    car.y += 3; // Slower traffic speed
-
-    // Collision Detection
-    if (
-      bus.x < car.x + car.width &&
-      bus.x + bus.width > car.x &&
-      bus.y < car.y + car.height &&
-      bus.y + bus.height > car.y
-    ) {
-      endGame();
-    }
-  });
-
-  // Clean up off-screen cars
-  traffic = traffic.filter(car => car.y < canvas.height);
-
-  score++;
-  scoreEl.innerText = Math.floor(score / 10);
-}
-
-function drawRoad() {
-  ctx.fillStyle = "#333";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
-  ctx.strokeStyle = "white";
-  ctx.setLineDash([20, 15]);
-  ctx.lineDashOffset = -roadOffset;
-  ctx.beginPath();
-  ctx.moveTo(200, 0);
-  ctx.lineTo(200, 600);
-  ctx.stroke();
-}
-
-function gameLoop() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawRoad();
-  drawBus();
-  drawTraffic();
-  update();
-  animationId = requestAnimationFrame(gameLoop);
+// ── Launch ─────────────────────────────────────────
+function launchGame() {
+  const sec = document.getElementById('game-section');
+  sec.classList.add('visible');
+  sec.scrollIntoView({ behavior: 'smooth' });
+  startGame();
 }
 
 function startGame() {
-  document.getElementById("menu").style.display = "none";
-  document.getElementById("gameArea").style.display = "block";
-  restartGame();
+  cancelAnimationFrame(animId);
+  clearInterval(trafficInterval);
+  init();
+  scheduleSpawn();
+  animId = requestAnimationFrame(loop);
 }
 
-function endGame() {
-  gameOver = true;
-  cancelAnimationFrame(animationId);
-  restartBtn.style.display = "inline-block";
-  ctx.fillStyle = "rgba(0,0,0,0.7)";
-  ctx.fillRect(0,0, canvas.width, canvas.height);
-  ctx.fillStyle = "white";
-  ctx.font = "bold 30px Arial";
-  ctx.fillText("ACCIDENT!", 120, 300);
+function restartGame() { startGame(); }
+
+function scheduleSpawn() {
+  clearInterval(trafficInterval);
+  trafficInterval = setInterval(spawnCar, state.spawnInterval);
 }
 
-function restartGame() {
-  // Clear any existing loops
-  cancelAnimationFrame(animationId);
-  traffic = [];
-  score = 0;
-  gameOver = false;
-  bus.x = 180;
-  restartBtn.style.display = "none";
-  spawnTraffic(); // Restart spawning
-  gameLoop();
+// ── Spawn Traffic ──────────────────────────────────
+function spawnCar() {
+  if (!state.alive) return;
+  const lane = LANE_X[Math.floor(Math.random() * LANE_X.length)];
+  const color = CAR_COLORS[Math.floor(Math.random() * CAR_COLORS.length)];
+  const emoji = CAR_EMOJIS[Math.floor(Math.random() * CAR_EMOJIS.length)];
+  state.traffic.push({
+    x: lane - CAR_W / 2,
+    y: -CAR_H - 10,
+    w: CAR_W, h: CAR_H,
+    speed: state.trafficSpeed + Math.random() * 1.2,
+    color, emoji
+  });
 }
+
+// ── Input Handling ─────────────────────────────────
+function handleInput() {
+  const b = state.bus;
+  if ((keys['ArrowLeft'] || keys['a'] || keys['A']) && b.x > 20)
+    b.x -= b.speed;
+  if ((keys['ArrowRight'] || keys['d'] || keys['D']) && b.x < ROAD_W - BUS_W - 20)
+    b.x += b.speed;
+}
+
+// ── Collision ──────────────────────────────────────
+function checkCollision(b, c) {
+  return b.x < c.x + c.w &&
+         b.x + BUS_W > c.x &&
+         b.y < c.y + c.h &&
+         b.y + BUS_H > c.y;
+}
+
+// ── Difficulty ─────────────────────────────────────
+function updateDifficulty() {
+  const t = state.tick;
+  state.trafficSpeed = 2.8 + (t / 400);
+  const newInterval  = Math.max(600, 1600 - t * 0.8);
+  if (Math.abs(newInterval - state.spawnInterval) > 50) {
+    state.spawnInterval = newInterval;
+    scheduleSpawn();
+  }
+  const pct = Math.min(100, (t / 2000) * 100);
+  document.getElementById('diffFill').style.width = pct + '%';
+}
+
+// ── Draw ───────────────────────────────────────────
+function drawRoad() {
+  // Asphalt
+  const grad = ctx.createLinearGradient(0, 0, ROAD_W, 0);
+  grad.addColorStop(0,   '#0a0f18');
+  grad.addColorStop(0.5, '#111a28');
+  grad.addColorStop(1,   '#0a0f18');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, ROAD_W, ROAD_H);
+
+  // Shoulder lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(20, 0); ctx.lineTo(20, ROAD_H); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ROAD_W - 20, 0); ctx.lineTo(ROAD_W - 20, ROAD_H); ctx.stroke();
+
+  // Lane dashes
+  ctx.strokeStyle = 'rgba(255,196,77,0.35)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([28, 22]);
+  ctx.lineDashOffset = -state.roadOffset;
+  [100, 175, 250, 325].forEach(lx => {
+    ctx.beginPath(); ctx.moveTo(lx, 0); ctx.lineTo(lx, ROAD_H); ctx.stroke();
+  });
+  ctx.setLineDash([]);
+}
+
+function drawCar(c) {
+  // Shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.beginPath();
+  ctx.ellipse(c.x + c.w / 2, c.y + c.h - 4, c.w / 2 - 2, 8, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Body
+  ctx.fillStyle = c.color;
+  ctx.beginPath();
+  ctx.roundRect(c.x, c.y, c.w, c.h, 6);
+  ctx.fill();
+
+  // Windshield glow
+  ctx.fillStyle = 'rgba(180,220,255,0.18)';
+  ctx.beginPath();
+  ctx.roundRect(c.x + 4, c.y + c.h * 0.6, c.w - 8, c.h * 0.22, 3);
+  ctx.fill();
+
+  // Headlights
+  ctx.fillStyle = 'rgba(255,240,180,0.8)';
+  ctx.beginPath(); ctx.ellipse(c.x + 6,       c.y + c.h - 8, 4, 3, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(c.x + c.w - 6, c.y + c.h - 8, 4, 3, 0, 0, Math.PI * 2); ctx.fill();
+}
+
+function drawBus() {
+  const b = state.bus;
+  const x = b.x, y = b.y;
+
+  // Shadow
+  ctx.fillStyle = 'rgba(0,229,160,0.08)';
+  ctx.beginPath();
+  ctx.ellipse(x + BUS_W / 2, y + BUS_H - 2, BUS_W / 2 + 4, 10, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Bus body
+  const busGrad = ctx.createLinearGradient(x, y, x + BUS_W, y);
+  busGrad.addColorStop(0, '#ffc94d');
+  busGrad.addColorStop(0.5, '#ffe082');
+  busGrad.addColorStop(1, '#ffa000');
+  ctx.fillStyle = busGrad;
+  ctx.beginPath();
+  ctx.roundRect(x, y, BUS_W, BUS_H, 7);
+  ctx.fill();
+
+  // Stripe
+  ctx.fillStyle = '#e65100';
+  ctx.fillRect(x, y + 12, BUS_W, 8);
+  ctx.fillRect(x, y + BUS_H - 20, BUS_W, 8);
+
+  // Windows
+  ctx.fillStyle = 'rgba(180,230,255,0.55)';
+  [[x + 5, y + 24], [x + 24, y + 24],
+   [x + 5, y + 42], [x + 24, y + 42]].forEach(([wx, wy]) => {
+    ctx.beginPath();
+    ctx.roundRect(wx, wy, 14, 10, 2);
+    ctx.fill();
+  });
+
+  // Windshield (top)
+  ctx.fillStyle = 'rgba(180,230,255,0.4)';
+  ctx.beginPath();
+  ctx.roundRect(x + 4, y + 4, BUS_W - 8, 10, 2);
+  ctx.fill();
+
+  // Headlights
+  ctx.fillStyle = 'rgba(255,240,180,0.9)';
+  ctx.beginPath(); ctx.ellipse(x + 7,        y + BUS_H - 6, 5, 4, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x + BUS_W - 7, y + BUS_H - 6, 5, 4, 0, 0, Math.PI * 2); ctx.fill();
+}
+
+function drawGameOver() {
+  // Dim overlay
+  ctx.fillStyle = 'rgba(8,12,20,0.82)';
+  ctx.fillRect(0, 0, ROAD_W, ROAD_H);
+
+  // Panel
+  ctx.fillStyle = '#0d1520';
+  ctx.strokeStyle = 'rgba(255,100,74,0.6)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(ROAD_W / 2 - 130, ROAD_H / 2 - 100, 260, 200, 12);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.textAlign = 'center';
+
+  // Title
+  ctx.fillStyle = '#ff6b4a';
+  ctx.font = 'bold 28px Orbitron, monospace';
+  ctx.fillText('GAME OVER', ROAD_W / 2, ROAD_H / 2 - 46);
+
+  // Score
+  ctx.fillStyle = '#e8f0fe';
+  ctx.font = '13px Rajdhani, sans-serif';
+  ctx.fillText('FINAL SCORE', ROAD_W / 2, ROAD_H / 2 - 14);
+  ctx.fillStyle = '#00e5a0';
+  ctx.font = 'bold 42px Orbitron, monospace';
+  ctx.fillText(Math.floor(state.score), ROAD_W / 2, ROAD_H / 2 + 30);
+
+  // Best
+  if (Math.floor(state.score) >= bestScore) {
+    ctx.fillStyle = '#ffc94d';
+    ctx.font = '12px Rajdhani, sans-serif';
+    ctx.fillText('✦ NEW BEST! ✦', ROAD_W / 2, ROAD_H / 2 + 52);
+  }
+
+  // Hint
+  ctx.fillStyle = '#6b8098';
+  ctx.font = '11px Inter, sans-serif';
+  ctx.fillText('Press R or click Restart', ROAD_W / 2, ROAD_H / 2 + 80);
+
+  ctx.textAlign = 'left';
+}
+
+// ── HUD ────────────────────────────────────────────
+function drawHUD() {
+  // score pill
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.beginPath(); ctx.roundRect(10, 10, 110, 36, 6); ctx.fill();
+  ctx.fillStyle = '#00e5a0';
+  ctx.font = 'bold 18px Orbitron, monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText(Math.floor(state.score), 20, 33);
+  ctx.fillStyle = '#6b8098';
+  ctx.font = '10px Inter, sans-serif';
+  ctx.fillText('SCORE', 58, 33);
+}
+
+// ── Main Loop ──────────────────────────────────────
+function loop() {
+  state.tick++;
+  state.roadOffset = (state.roadOffset + state.trafficSpeed * 0.7) % 50;
+
+  handleInput();
+  updateDifficulty();
+
+  // Move traffic
+  state.traffic.forEach(c => { c.y += c.speed; });
+  state.traffic = state.traffic.filter(c => c.y < ROAD_H + 20);
+
+  // Collision
+  for (const c of state.traffic) {
+    if (checkCollision(state.bus, c)) {
+      state.alive = false;
+      state.screenShake = 18;
+      state.flash = 10;
+      if (Math.floor(state.score) > bestScore) {
+        bestScore = Math.floor(state.score);
+        document.getElementById('bestDisplay').textContent = bestScore;
+      }
+      break;
+    }
+  }
+
+  // Score
+  if (state.alive) {
+    state.score += 0.4;
+    document.getElementById('scoreDisplay').textContent = Math.floor(state.score);
+  }
+
+  // Screen shake
+  let sx = 0, sy = 0;
+  if (state.screenShake > 0) {
+    sx = (Math.random() - 0.5) * state.screenShake;
+    sy = (Math.random() - 0.5) * state.screenShake;
+    state.screenShake *= 0.8;
+  }
+
+  ctx.save();
+  ctx.translate(sx, sy);
+
+  drawRoad();
+  state.traffic.forEach(drawCar);
+  drawBus();
+  drawHUD();
+
+  // Flash
+  if (state.flash > 0) {
+    ctx.fillStyle = `rgba(255,100,74,${state.flash / 40})`;
+    ctx.fillRect(0, 0, ROAD_W, ROAD_H);
+    state.flash--;
+  }
+
+  if (!state.alive) drawGameOver();
+
+  ctx.restore();
+
+  if (!state.alive) { clearInterval(trafficInterval); return; }
+  animId = requestAnimationFrame(loop);
+}
+
+// ── Mobile touch ───────────────────────────────────
+let touchStartX = null;
+canvas.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+canvas.addEventListener('touchmove', e => {
+  if (touchStartX === null) return;
+  const dx = e.touches[0].clientX - touchStartX;
+  if (dx < -10) { keys['ArrowLeft'] = true;  keys['ArrowRight'] = false; }
+  if (dx >  10) { keys['ArrowRight'] = true; keys['ArrowLeft'] = false; }
+  e.preventDefault();
+}, { passive: false });
+canvas.addEventListener('touchend', () => {
+  keys['ArrowLeft'] = false; keys['ArrowRight'] = false; touchStartX = null;
+});
 </script>
-
 </body>
 </html>
