@@ -1,4 +1,4 @@
-# 🚌 Bus Mini Sim
+# 🚌 MINI BUS RIDE
 
 A browser-based driving game inspired by real Kerala road conditions and bus driving experience.
 
