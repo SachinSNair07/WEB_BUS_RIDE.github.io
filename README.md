@@ -47,7 +47,7 @@ It demonstrates core game development concepts such as:
 
 ## 🌐 Live Demo
 
-👉 https://sachinsnair07.github.io/WEB_BUS_RIDE.github.io/
+👉 https://sachinsnair07.github.io/BUS_RIDE.github.io/
 
 
 
